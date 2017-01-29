@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 
 class CountriesList extends Component {
-  renderCountries(){
+  renderCountries() {
     const countries = this.props.countries;
+
     return (
       countries.map((country, index) => {
         return(
@@ -16,6 +17,7 @@ class CountriesList extends Component {
 
   renderYears() {
     const years = this.props.years;
+
     return (
       years.map((year, index) => {
         return (
@@ -30,11 +32,12 @@ class CountriesList extends Component {
   render() {
     return (
       <div>
-        <select onChange={this.props.onCountryChange}>
+        <select onChange={this.props.onCountryChange} value={this.props.selectedCountry}>
           <option value="-1" key="-1">Select a country</option>
             {this.renderCountries()}
         </select>
-        <select onChange={this.props.onYearChange}>
+
+        <select onChange={this.props.onYearChange} value={this.props.selectedYear}>
           <option value="-1" key="-1">Select Year</option>
             {this.renderYears()}
         </select>
