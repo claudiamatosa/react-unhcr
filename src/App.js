@@ -10,14 +10,21 @@ class App extends Component {
     super(props);
     this.state = {
       countriesList: [],
-      countryData: null
+      countryData: null,
+      yearList:[],
+      selectedYear: null
     }
   }
   onCountryChange = (event) => {
     this.setState({ selectedCountry: event.target.value });
   }
+
+  onYearChange = (event) => {
+    this.setState({ selectedYear: event.target.value });
+  }
+
   onSubmitCountry = () => {
-    this.getCountryStatistics(this.state.selectedCountry, '2013');
+    this.getCountryStatistics(this.state.selectedCountry, this.state.selectedYear);
   }
   render() {
     return (
@@ -28,7 +35,12 @@ class App extends Component {
         </div>
         <div className="app-search-box">
           <div>
-            <CountriesList onChange={this.onCountryChange} countries={this.state.countriesList} />
+            <CountriesList
+              countries={this.state.countriesList}
+              onCountryChange={this.onCountryChange}
+              years={this.state.yearList}
+              onYearChange={this.onYearChange}
+            />
           </div>
           <div>
             <button onClick={this.onSubmitCountry} type="submit">Retrieve Country statistics</button>
@@ -41,21 +53,32 @@ class App extends Component {
   }
   componentDidMount() {
       this.getCountriesList();
+      this.getYearList();
   }
   getCountriesList() {
-    fetch('http://data.unhcr.org/api/stats/country_of_residence.json')
+    const countryURL = 'http://data.unhcr.org/api/stats/country_of_residence.json'
+    fetch(countryURL)
       .then(response => response.json())
       .then(data => {
-        this.setState({ countriesList: data } );
+        this.setState({ countriesList: data });
       });
   }
-  getCountryStatistics(countryCode, year) {
-    if(countryCode === '-1') return;
-    const url = 'http://data.unhcr.org/api/stats/demographics.json?country_of_residence=' + countryCode + '&year=' + year;
 
-    fetch(url)
+  getYearList() {
+    const yearURL = 'http://data.unhcr.org/api/stats/time_series_years.json';
+    fetch(yearURL)
     .then(response => response.json())
     .then(data => {
+      this.setState({ yearList: data });
+    });
+  }
+
+  getCountryStatistics(countryCode, year) {
+    if(countryCode === '-1' || countryCode === undefined) return;
+    const url = `http://data.unhcr.org/api/stats/demographics.json?country_of_residence=${countryCode}&year=${year}`;
+    fetch(url)
+      .then(response => response.json())
+      .then(data => {
       //The data comes back as an array, we take the first element of the array as it contains our country data
       this.setState({ countryData: data[0]})
     })

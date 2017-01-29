@@ -2,6 +2,7 @@ import React from 'react';
 
 function CountryDetails(props) {
   const countryData = props.data;
+  console.info(countryData);
   return (
     <div className="app-country-statistics">
       <strong>Country: </strong>{countryData.country_of_residence_en}<br/>
