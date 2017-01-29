@@ -3,14 +3,21 @@ import React, { Component } from 'react';
 import logo from './images/cyf.png';
 import './styles/App.css';
 import CountriesList from './components/CountriesList';
+import CountryDetails from './components/CountryDetails';
 
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
       countriesList: [],
-      countryData: {}
+      countryData: null
     }
+  }
+  onCountryChange = (event) => {
+    this.setState({ selectedCountry: event.target.value });
+  }
+  onSubmitCountry = () => {
+    this.getCountryStatistics(this.state.selectedCountry, '2013');
   }
   render() {
     return (
@@ -21,24 +28,19 @@ class App extends Component {
         </div>
         <div className="app-search-box">
           <div>
-            <CountriesList countries={this.state.countriesList} />
+            <CountriesList onChange={this.onCountryChange} countries={this.state.countriesList} />
           </div>
           <div>
-            <button onClick={()=>alert('Not implemented')} type="submit">Retrieve Country statistics</button>
+            <button onClick={this.onSubmitCountry} type="submit">Retrieve Country statistics</button>
           </div>
         </div>
-        <div className="app-country-statistics">
-          <strong>Country: </strong>{this.state.countryData.country_of_residence_en}<br/>
-          <strong>Year: </strong>{this.state.countryData.year}<br/>
-          <strong>Female Refugees: </strong>{this.state.countryData.female_total_value}<br/>
-          <strong>Male Refugees: </strong>{this.state.countryData.male_total_value}<br/>
-        </div>
+        {(this.state.countryData? <CountryDetails data={this.state.countryData} /> : <div>Select a country please.</div>)}
+
       </div>
     );
   }
   componentDidMount() {
       this.getCountriesList();
-      this.getCountryStatistics('TUR', '2013');
   }
   getCountriesList() {
     fetch('http://data.unhcr.org/api/stats/country_of_residence.json')
@@ -48,6 +50,7 @@ class App extends Component {
       });
   }
   getCountryStatistics(countryCode, year) {
+    if(countryCode === '-1') return;
     const url = 'http://data.unhcr.org/api/stats/demographics.json?country_of_residence=' + countryCode + '&year=' + year;
 
     fetch(url)
